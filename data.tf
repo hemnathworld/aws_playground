@@ -16,5 +16,10 @@ data "aws_iam_policy_document" "deny_ec2_vpc_actions" {
       "ec2:DeleteVpc"
     ]
     resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:PrincipalAccount"
+      values  = ["123456789012"]
+    }
   }
 }
