@@ -1,0 +1,31 @@
+resource "aws_route_table" "public" {
+  count = length([for s in var.subnet_mapping: s if s.public_subnet]) > 0 ? 1 : 0
+
+  vpc_id = aws_vpc.sharedvpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.this.id
+  }
+
+  tags = {
+    Name = "${var.sharedvpc_name}_Rtp_Main"
+  }
+}
+
+resource "aws_internet_gateway" "this" {
+  count = length([for s in var.subnet_mapping : s if s.public_subnet]) > 0 ? 1 : 0
+
+  vpc_id = aws_vpc.sharedvpc.id
+
+  tags = {
+    Name = "${var.sharedvpc_name}_IGW"
+  }
+}
+
+resource "aws_route_table_association" "public_association" {
+  for_each = { for s in var.subnet_mapping : s.cidr => s if s.public_subnet }
+
+  subnet_id      = aws_subnet.private_subnet[each.key].id
+  route_table_id = aws_route_table.public[0].id
+}
