@@ -1,97 +1,67 @@
-provider "aws" {
-  alias = "primary"
-  region = "us-west-1"
+# Read config from JSON file
+variable "config" {
+  type = object({
+    region               = string
+    bucket_name          = string
+    eb_app_name          = string
+    env_name             = string
+    instance_type        = string
+    solution_stack       = string
+    route53_zone_id      = string
+    domain_name          = string
+    zone_id              = string
+    health_check_enabled = bool
+  })
 }
 
+# AWS provider for the given region
 provider "aws" {
-  alias = "failover"
-  region = "us-east-1"
+  region = var.config.region
 }
 
+# S3 bucket for Elastic Beanstalk app versions
+resource "aws_s3_bucket" "eb_application_bucket" {
+  bucket = var.config.bucket_name
+}
 
-# Create Elastic Beanstalk Application
+# Elastic Beanstalk Application
 resource "aws_elastic_beanstalk_application" "app" {
-  provider = aws.primary
-  name     = "my-elastic-beanstalk-app"
+  name        = var.config.eb_app_name
+  description = "Elastic Beanstalk application"
 }
 
-resource "aws_elastic_beanstalk_application" "app_failover" {
-  provider = aws.failover
-  name     = "my-elastic-beanstalk-app"
-}
+# Elastic Beanstalk environment
+resource "aws_elastic_beanstalk_environment" "env" {
+  name                = var.config.env_name
+  application         = aws_elastic_beanstalk_application.app.name
+  solution_stack_name = var.config.solution_stack
 
-# Primary Elastic Beanstalk environment in us-west-1
-resource "aws_elastic_beanstalk_environment" "primary_env" {
-  provider        = aws.primary
-  name            = "my-primary-env"
-  application     = aws_elastic_beanstalk_application.app.name
-  solution_stack_name = "64bit Amazon Linux 2 v3.3.4 running Node.js 14"
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
-    value     = "t2.micro"
+    value     = var.config.instance_type
   }
 }
 
-# Failover Elastic Beanstalk environment in us-east-1
-resource "aws_elastic_beanstalk_environment" "failover_env" {
-  provider        = aws.failover
-  name            = "my-failover-env"
-  application     = aws_elastic_beanstalk_application.app_failover.name
-  solution_stack_name = "64bit Amazon Linux 2 v3.3.4 running Node.js 14"
-  setting {
-    namespace = "aws:autoscaling:launchconfiguration"
-    name      = "InstanceType"
-    value     = "t2.micro"
-  }
-}
-
-# Create Route 53 health checks for both environments
-resource "aws_route53_health_check" "primary_health_check" {
-  fqdn              = aws_elastic_beanstalk_environment.primary_env.endpoint_url
-  type              = "HTTPS"
-  resource_path     = "/"
-  request_interval  = 30
-  failure_threshold = 3
-}
-
-resource "aws_route53_health_check" "failover_health_check" {
-  fqdn              = aws_elastic_beanstalk_environment.failover_env.endpoint_url
-  type              = "HTTPS"
-  resource_path     = "/"
-  request_interval  = 30
-  failure_threshold = 3
-}
-
-# Create Route 53 failover DNS records
-resource "aws_route53_record" "primary" {
-  zone_id = "YOUR_ZONE_ID"
-  name    = "myapp.example.com"
+# Route 53 DNS record for the environment
+resource "aws_route53_record" "eb_dns" {
+  zone_id = var.config.route53_zone_id
+  name    = var.config.domain_name
   type    = "A"
-  set_identifier = "Primary Region"
+
   alias {
-    name                   = aws_elastic_beanstalk_environment.primary_env.endpoint_url
-    zone_id                = "YOUR_PRIMARY_BEANSTALK_ZONE_ID"
-    evaluate_target_health = true
+    name                   = aws_elastic_beanstalk_environment.env.endpoint_url
+    zone_id                = var.config.zone_id
+    evaluate_target_health = var.config.health_check_enabled
   }
-  failover_routing_policy {
-    type = "PRIMARY"
-  }
-  health_check_id = aws_route53_health_check.primary_health_check.id
 }
 
-resource "aws_route53_record" "failover" {
-  zone_id = "YOUR_ZONE_ID"
-  name    = "myapp.example.com"
-  type    = "A"
-  set_identifier = "Failover Region"
-  alias {
-    name                   = aws_elastic_beanstalk_environment.failover_env.endpoint_url
-    zone_id                = "YOUR_FAILOVER_BEANSTALK_ZONE_ID"
-    evaluate_target_health = true
-  }
-  failover_routing_policy {
-    type = "SECONDARY"
-  }
-  health_check_id = aws_route53_health_check.failover_health_check.id
+# (Optional) Route 53 health check if enabled
+resource "aws_route53_health_check" "eb_health_check" {
+  count              = var.config.health_check_enabled ? 1 : 0
+  fqdn               = aws_elastic_beanstalk_environment.env.endpoint_url
+  type               = "HTTPS"
+  resource_path      = "/"
+  request_interval   = 30
+  failure_threshold  = 3
 }
