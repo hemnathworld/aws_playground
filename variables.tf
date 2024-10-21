@@ -3,11 +3,6 @@ variable "region" {
   description = "AWS region where resources will be created"
 }
 
-variable "bucket_name" {
-  type        = string
-  description = "S3 bucket name for Elastic Beanstalk application versions"
-}
-
 variable "eb_app_name" {
   type        = string
   description = "Name of the Elastic Beanstalk application"
