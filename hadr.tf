@@ -27,7 +27,7 @@ resource "aws_elastic_beanstalk_application" "app" {
   description = "Elastic Beanstalk application"
 }
 
-# Elastic Beanstalk environment
+# Elastic Beanstalk environment within VPC
 resource "aws_elastic_beanstalk_environment" "env" {
   name                = var.env_name
   application         = aws_elastic_beanstalk_application.app.name
@@ -37,6 +37,25 @@ resource "aws_elastic_beanstalk_environment" "env" {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
     value     = var.instance_type
+  }
+
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "VPCId"
+    value     = var.vpc_id
+  }
+
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "Subnets"
+    value     = join(",", var.subnet_ids)
+  }
+
+  # Optionally specify security groups
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "SecurityGroups"
+    value     = join(",", var.security_group_ids)
   }
 }
 
