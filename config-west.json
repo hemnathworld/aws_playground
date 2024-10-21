@@ -7,6 +7,8 @@
   "solution_stack": "64bit Amazon Linux 2 v3.3.4 running Node.js 14",
   "private_dns_domain_name": "internal.example.com",
   "vpc_id": "vpc-1234567890abcdef0",
+  "subnet_ids": ["subnet-12345", "subnet-67890"],
+  "security_group_ids": ["sg-0123456789abcdef0"],
   "private_dns_record": "app.internal.example.com",
   "health_check_enabled": true
 }
