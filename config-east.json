@@ -1,0 +1,11 @@
+{
+  "region": "us-east-1",
+  "bucket_name": "eb-app-failover-east",
+  "eb_app_name": "my-eb-app-failover",
+  "env_name": "failover-env",
+  "instance_type": "t2.micro",
+  "solution_stack": "64bit Amazon Linux 2 v3.3.4 running Node.js 14",
+  "private_dns_domain_name": "internal.example.com",
+  "private_dns_record": "app.internal.example.com",
+  "health_check_enabled": true
+}
