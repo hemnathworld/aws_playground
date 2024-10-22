@@ -18,7 +18,6 @@ resource "aws_route53_zone" "private_dns_zone" {
 data "aws_route53_zone" "private_zone" {
   count       = var.region == "us-east-1" ? 1 : 0
   name        = var.private_dns_domain_name
-  private_zone = true
 }
 
 # Elastic Beanstalk Application
