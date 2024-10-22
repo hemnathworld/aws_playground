@@ -63,13 +63,10 @@ resource "aws_elastic_beanstalk_environment" "env" {
 resource "aws_route53_record" "eb_private_dns" {
   zone_id = var.region == "us-west-1" ? aws_route53_zone.private_dns_zone[0].id : data.aws_route53_zone.private_zone[0].zone_id
   name    = var.private_dns_record
-  type    = "A"
+  type    = "CNAME"
+  ttl     = 60
 
-  alias {
-    name                   = aws_elastic_beanstalk_environment.env.cname
-    zone_id                = aws_elastic_beanstalk_environment.env.endpoint_zone_id
-    evaluate_target_health = var.health_check_enabled
-  }
+  records = [aws_elastic_beanstalk_environment.env.cname]
 }
 
 # Optional Route 53 health check if enabled
