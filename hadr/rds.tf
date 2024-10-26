@@ -24,7 +24,7 @@ resource "aws_db_instance" "primary" {
 resource "aws_db_subnet_group" "primary" {
   count       = var.region == "us-west-1" ? 1 : 0
   name       = "${var.db_identifier}-primary"
-  subnet_ids = var.subnet_ids  # Provide your subnet IDs
+  subnet_ids = var.db_subnet_ids  # Provide your subnet IDs
 
   tags = {
     Name = "${var.db_identifier}-primary-subnet-group"
@@ -66,7 +66,7 @@ resource "aws_db_instance" "replica" {
 resource "aws_db_subnet_group" "replica" {
   count       = var.region == "us-east-1" ? 1 : 0
   name      = "${var.db_identifier}-replica"
-  subnet_ids = var.subnet_ids  # Provide your subnet IDs
+  subnet_ids = var.db_subnet_ids  # Provide your subnet IDs
 
   tags = {
     Name = "${var.db_identifier}-replica-subnet-group"
