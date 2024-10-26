@@ -14,7 +14,7 @@ variable "enable_replication" {
   default     = false
 }
 
-variable "subnet_ids" {
+variable "db_subnet_ids" {
   description = "Identifier for the RDS database"
   type        = list
 }
