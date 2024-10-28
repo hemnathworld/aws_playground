@@ -65,7 +65,7 @@ resource "aws_instance" "app_server_primary" {
   ami                    = var.ami
  instance_type          = "t2.micro"
   iam_instance_profile   = var.iam_profile_name
-  vpc_security_group_ids = [aws_security_group.allow_http[count.index].id]
+  vpc_security_group_ids = [aws_security_group.allow_http_primary[count.index].id]
   subnet_id              = var.subnet_id
   private_ip             = var.private_ip
 
