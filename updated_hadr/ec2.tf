@@ -36,7 +36,7 @@ resource "aws_security_group" "allow_http" {
 resource "aws_instance" "app_server" {
   ami                    = var.ami
  instance_type          = "t2.micro"
-  iam_instance_profile   = "ec2_instance_profile"
+  iam_instance_profile   = var.iam_profile_name
   vpc_security_group_ids = [aws_security_group.allow_http.id]
   subnet_id              = var.subnet_id
   private_ip             = var.private_ip
