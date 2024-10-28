@@ -1,0 +1,13 @@
+{
+    "region": "us-west-1",
+    "bucket_name": "hemtestbucket-hadr",
+    "enable_replication": true,
+    "dynamodb_table_name": "hem-dynamodbtable",
+    "ami": "ami-0819a8650d771b8be",
+    "primary_vpc_id": "vpc-00cc3e954b1473d4b",
+    "secondary_vpc_id": "vpc-01b450f3a3162df10",
+    "subnet_id": "subnet-03e8dda3cd94419f6",
+    "private_ip": "172.31.24.48",
+    "private_zone_name": "hemnathnewtest"
+}
+
