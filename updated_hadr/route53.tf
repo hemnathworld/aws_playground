@@ -1,8 +1,3 @@
-resource "aws_sns_topic" "instance_status_topic" {
-  count    = var.region == "us-west-1" ? 1 : 0
-  name = "HADR_Topic"
-}
-
 resource "aws_cloudwatch_metric_alarm" "instance_status_check" {
   count    = var.region == "us-west-1" ? 1 : 0
   alarm_name          = "PrimaryInstanceStatusCheck"
@@ -15,10 +10,8 @@ resource "aws_cloudwatch_metric_alarm" "instance_status_check" {
   threshold          = "1"
   alarm_description  = "Alarm when the primary instance fails status checks"  
   dimensions = {
-    InstanceId = aws_instance.app_server.id 
+    InstanceId = aws_instance.app_server_primary.id 
   }
-
-  alarm_actions = [aws_sns_topic.instance_status_topic[count.index].arn] 
  }
 
 resource "aws_route53_health_check" "health_check" {
