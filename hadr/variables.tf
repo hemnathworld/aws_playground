@@ -11,9 +11,10 @@ variable "bucket_name" {
 variable "enable_replication" {
   description = "Enable Cross-Region Replication"
   type        = bool
+  default     = false
 }
 
-variable "subnet_ids" {
+variable "db_subnet_ids" {
   description = "Identifier for the RDS database"
   type        = list
 }

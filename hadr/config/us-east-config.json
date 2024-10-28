@@ -2,7 +2,7 @@
     "region": "us-east-1",
     "bucket_name": "hemtestbucket-hadr",
     "enable_replication": false,
-    "subnet_ids": ["subnet-05794172e4248359c", "subnet-056b153ebbabcdc75"],
+    "db_subnet_ids": ["subnet-05794172e4248359c", "subnet-056b153ebbabcdc75"],
     "db_identifier": "hemtestdb",
     "db_username": "testuser",
     "db_password": "password$1234789"   
