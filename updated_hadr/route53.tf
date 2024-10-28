@@ -30,6 +30,7 @@ resource "aws_route53_zone" "private_zone" {
   }
   vpc {
     vpc_id = var.secondary_vpc_id
+    vpc_region = "us-gov-east-1"
   }
 }
 
