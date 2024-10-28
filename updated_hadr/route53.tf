@@ -65,9 +65,15 @@ resource "aws_route53_record" "failover_primary" {
   health_check_id = aws_route53_health_check.health_check[count.index].id
 }
 
+data "aws_route53_zone" "private_zone_secondary" {
+  count = var.region == "us-east-1" ? 1 : 0
+  name  = var.private_zone_name
+  private_zone = true
+}
+
 resource "aws_route53_record" "failover_secondary" {
   count    = var.region == "us-east-1" ? 1 : 0
-  zone_id =  "Z04862391RXYTGSP0I10B"
+  zone_id =  data.aws_route53_zone.private_zone_secondary[0].id
   name     = "app.${var.private_zone_name}"
   type     = "A"
   ttl      = 60
