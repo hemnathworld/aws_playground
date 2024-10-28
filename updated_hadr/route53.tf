@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_metric_alarm" "instance_status_check" {
   count    = var.region == "us-west-1" ? 1 : 0
   alarm_name          = "PrimaryInstanceStatusCheck"
-  comparison_operator = "LessThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name        = "StatusCheckFailed"
   namespace          = "AWS/EC2"
