@@ -14,8 +14,17 @@ pip3 install flask-cors
 
 # Mount the S3 bucket using s3fs
 sudo mkdir /var/www/html/app
-s3fs hemtestbucket-hadr-us-east-1 /var/www/html/app -o iam_role=ec2_dynamo_s3_access_role -o allow_other
-chmod 755 /var/www/html/app/*
+
+# Mount the S3 bucket (replace 'your-bucket-name' accordingly)
+echo "hemtestbucket-hadr-us-west-1 /var/www/html/app s3fs _netdev,allow_other,iam_role=ec2_dynamo_s3_access_role,uid=www-data,gid=www-data,umask=0022 0 0" >> /etc/fstab
+
+# Mount the S3 bucket immediately
+mount -a
+
+# Set permissions on the mounted directory
+chmod -R 755 /var/www/html/app
+chown -R www-data:www-data /var/www/html/app
+
 
 # Create a simple Flask API application for DynamoDB access
 cat <<EOL > /var/www/html/customer_management.html
