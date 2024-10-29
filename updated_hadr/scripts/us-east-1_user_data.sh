@@ -158,4 +158,24 @@ EOL
 
 # Make the Flask app executable and run it
 chmod +x /var/www/html/app.py
-nohup python3 /var/www/html/app.py &
+
+# Create the systemd service file
+cat <<EOF > /etc/systemd/system/flask-app.service
+[Unit]
+Description=Flask App Service
+After=network.target
+
+[Service]
+User=ubuntu  # Replace 'ubuntu' with the appropriate user if different
+WorkingDirectory=/var/www/html
+ExecStart=/usr/bin/python3 /var/www/html/app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd, enable, and start the Flask service
+systemctl daemon-reload
+systemctl enable flask-app.service
+systemctl start flask-app.service
