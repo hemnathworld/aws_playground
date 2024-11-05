@@ -1,14 +1,11 @@
-Yes, it appears that **Amazon EventBridge** is attempting to call `schema:ListDiscoverers` as part of its setup, even though the event bus itself doesn't directly require a schema registry.
+aws events put-rule --name "TestRule" --event-bus-name "MyEventBus" --event-pattern '{"source": ["com.example.test"]}'
 
-To work around this:
+aws events put-targets --rule "TestRule" --event-bus-name "MyEventBus" --targets "Id"="1","Arn"="arn:aws:logs:your-region:your-account-id:log-group:/aws/events/test-log-group"
 
-1. **Temporary Update to SCP**:
-   - If possible, temporarily allow the `schema:ListDiscoverers` permission in the SCP for just the creation process. Once the event bus is created, you can revert the SCP to deny schema permissions again.
 
-2. **Contact AWS Support**:
-   - If modifying the SCP is not feasible, you could contact AWS Support to confirm if this dependency is required for the event bus and if there’s any workaround for environments with SCP restrictions.
-
-3. **Alternative Creation Method**:
-   - Sometimes using a different method (e.g., CloudFormation template or AWS SDK) for creating the event bus may bypass this check, though this isn’t guaranteed.
-
-This dependency may be an implicit check by EventBridge, so adjusting the SCP temporarily is likely the most straightforward approach. Let me know if you need further help with the workaround!
+aws events put-events --entries '[{
+  "Source": "com.example.test",
+  "DetailType": "Test Event",
+  "Detail": "{ \"key\": \"value\" }",
+  "EventBusName": "MyEventBus"
+}]'
