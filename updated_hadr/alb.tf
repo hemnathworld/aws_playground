@@ -1,7 +1,7 @@
 # Security Group for Load Balancer to allow HTTP access
 resource "aws_security_group" "allow_lb_http" {
   name_prefix = "allow_lb_http"
-  vpc_id = alb_vpc_id
+  vpc_id = var.alb_vpc_id
   ingress {
     from_port   = 80
     to_port     = 80
