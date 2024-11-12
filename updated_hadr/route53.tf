@@ -40,7 +40,7 @@ resource "aws_vpc_dhcp_options_association" "dhcp_options_association_secondary"
 # Route 53 CNAME Web Record for the primary Load Balancer
 resource "aws_route53_record" "primary_web_cname_record" {
   count    = var.region == "us-west-1" ? 1 : 0
-  zone_id = var.hosted_zone_id # Route 53 Hosted Zone ID
+  zone_id = aws_lb.network_lb.zone_id # Route 53 Hosted Zone ID
   name    = "web.${var.private_zone_name}"  
   type    = "CNAME"
   ttl     = 10
@@ -56,7 +56,7 @@ resource "aws_route53_record" "primary_web_cname_record" {
 # Route 53 CNAME Web Record for the secondary Load Balancer
 resource "aws_route53_record" "secondary_web_cname_record" {
   count    = var.region == "us-east-1" ? 1 : 0
-  zone_id = var.hosted_zone_id # Route 53 Hosted Zone ID
+  zone_id = aws_lb.network_lb.zone_id # Route 53 Hosted Zone ID
   name    = "web.${var.private_zone_name}"  
   type    = "CNAME"
   ttl     = 10
