@@ -57,5 +57,6 @@ resource "aws_lb_listener" "nlb_listener" {
 resource "aws_lb_target_group_attachment" "ip_target_attachment" {
   target_group_arn = aws_lb_target_group.nlb_target_group.arn
   target_id        = var.private_ip
+  availability_zone = "all"
   port             = 80
 }
