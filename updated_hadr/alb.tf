@@ -18,8 +18,9 @@ resource "aws_security_group" "allow_lb_http" {
 }
 
 
-# Load Balancer (CLB) with single Availability Zone
+# Load Balancer (CLB) with single Availability Zone in us-west-1
 resource "aws_elb" "app_lb" {
+  count    = var.region == "us-west-1" ? 1 : 0
   name               = "app-lb-${var.region}"
   internal           = false
   security_groups    = [aws_security_group.allow_lb_http.id]
@@ -39,7 +40,37 @@ resource "aws_elb" "app_lb" {
     healthy_threshold   = 2
   }
 
-  instances = [aws_instance.app_server.id]
+  instances = [aws_instance.primary_instance.id]
+
+  tags = {
+    Name = "app-lb-${var.region}"
+  }
+}
+
+
+# Load Balancer (CLB) with single Availability Zone in us-west-1
+resource "aws_elb" "app_lb" {
+  count    = var.region == "us-east-1" ? 1 : 0
+  name               = "app-lb-${var.region}"
+  internal           = false
+  security_groups    = [aws_security_group.allow_lb_http.id]
+  subnets            = var.alb_subnet_ids
+  cross_zone_load_balancing = false  
+  listener {
+    lb_port           = 80
+    instance_port     = 80
+    protocol          = "HTTP"
+  }
+
+  health_check {
+    target              = "HTTP:80/"
+    interval            = 10
+    timeout             = 5
+    unhealthy_threshold = 2
+    healthy_threshold   = 2
+  }
+
+  instances = [aws_instance.secondary_instance.id]
 
   tags = {
     Name = "app-lb-${var.region}"
