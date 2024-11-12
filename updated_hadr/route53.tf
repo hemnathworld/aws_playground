@@ -37,33 +37,43 @@ resource "aws_vpc_dhcp_options_association" "dhcp_options_association_secondary"
   dhcp_options_id = aws_vpc_dhcp_options.dhcp_options.id
 }
 
-# Route 53 CNAME Record for the Load Balancer
+# Route 53 CNAME Web Record for the primary Load Balancer
 resource "aws_route53_record" "primary_web_cname_record" {
+  count    = var.region == "us-west-1" ? 1 : 0
   zone_id = var.hosted_zone_id # Route 53 Hosted Zone ID
   name    = "web.${var.private_zone_name}"  
   type    = "CNAME"
   ttl     = 10
-  records = [aws_lb.network_lb.dns_name] 
-}
-
-
-# Route 53 Alias Record to point to NLB
-resource "aws_route53_record" "primary_alias_record" {
-  count    = var.region == "us-west-1" ? 1 : 0
-  zone_id = aws_route53_zone.private_zone[count.index].id
-  name    = "app.${var.private_zone_name}" 
-  type    = "A"
-  ttl = 60
-  alias {
-    name                   = aws_lb.network_lb.dns_name
-    zone_id                = aws_lb.network_lb.zone_id
-    evaluate_target_health = true
-  }
+  records = [aws_lb.network_lb.dns_name]
   set_identifier = "Primary"
   failover_routing_policy {
     type = "PRIMARY"
+
   }
-  health_check_id = aws_route53_health_check.primary_health_check[count.index].id
+  health_check_id = aws_route53_health_check.health_check[count.index].id
+}
+
+# Route 53 CNAME Web Record for the secondary Load Balancer
+resource "aws_route53_record" "secondary_web_cname_record" {
+  count    = var.region == "us-east-1" ? 1 : 0
+  zone_id = var.hosted_zone_id # Route 53 Hosted Zone ID
+  name    = "web.${var.private_zone_name}"  
+  type    = "CNAME"
+  ttl     = 10
+  records = [aws_lb.network_lb.dns_name]
+  set_identifier = "Secondary"
+  failover_routing_policy {
+    type = "SECONDARY"
+  }
+}
+
+resource "aws_route53_record" "app_primary_record" {
+  count    = var.region == "us-west-1" ? 1 : 0
+  zone_id = aws_route53_zone.private_zone[count.index].id
+  name     = "app-us-gov-west-1.${var.private_zone_name}"
+  type     = "A"
+  ttl      = 60
+  records  = [var.private_ip]
 }
 
 data "aws_route53_zone" "private_zone_secondary" {
@@ -72,18 +82,12 @@ data "aws_route53_zone" "private_zone_secondary" {
   private_zone = true
 }
 
-resource "aws_route53_record" "secondary_alias_record" {
+resource "aws_route53_record" "app_secondary_record" {
   count    = var.region == "us-east-1" ? 1 : 0
-  zone_id = data.aws_route53_zone.private_zone_secondary[0].id
-  name    = "app.${var.private_zone_name}" 
-  type    = "A"
-  ttl = 10
-  alias {
-    name                   = aws_lb.network_lb.dns_name
-    zone_id                = aws_lb.network_lb.zone_id
-  }
-  set_identifier = "Secondary"
-  failover_routing_policy {
-    type = "SECONDARY"
-  }
+  zone_id =  data.aws_route53_zone.private_zone_secondary[0].id
+  name     = "app-us-gov-east-1.${var.private_zone_name}"
+  type     = "A"
+  ttl      = 60
+  records  = [var.private_ip]
 }
+
