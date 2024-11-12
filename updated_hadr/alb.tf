@@ -21,7 +21,7 @@ resource "aws_lb" "network_lb" {
   name               = "app-network-lb"
   internal           = false
   load_balancer_type = "network"
-  security_groups    = [aws_security_group.allow_http.id]
+  security_groups    = [aws_security_group.allow_lb_http.id]
   subnets            = var.alb_subnet_ids
 }
 
