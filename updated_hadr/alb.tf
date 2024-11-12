@@ -17,62 +17,45 @@ resource "aws_security_group" "allow_lb_http" {
   }
 }
 
-
-# Load Balancer (CLB) with single Availability Zone in us-west-1
-resource "aws_elb" "app_lb" {
-  count    = var.region == "us-west-1" ? 1 : 0
-  name               = "app-lb-${var.region}"
+resource "aws_lb" "network_lb" {
+  name               = "app-network-lb"
   internal           = false
-  security_groups    = [aws_security_group.allow_lb_http.id]
+  load_balancer_type = "network"
+  security_groups    = [aws_security_group.allow_http.id]
   subnets            = var.alb_subnet_ids
-  cross_zone_load_balancing = false  
-  listener {
-    lb_port           = 80
-    instance_port     = 80
-    protocol          = "HTTP"
-  }
+}
+
+resource "aws_lb_target_group" "nlb_target_group" {
+  name        = "my-target-group"
+  port        = 80
+  protocol    = "TCP"
+  target_type = "ip" 
+  vpc_id      = var.alb_vpc_id
 
   health_check {
-    target              = "HTTP:80/"
     interval            = 10
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
     timeout             = 5
-    unhealthy_threshold = 2
     healthy_threshold   = 2
-  }
-
-  instances = [aws_instance.primary_instance.id]
-
-  tags = {
-    Name = "app-lb-${var.region}"
+    unhealthy_threshold = 2
   }
 }
 
+resource "aws_lb_listener" "nlb_listener" {
+  load_balancer_arn = aws_lb.network_lb.arn
+  port              = 80
+  protocol          = "TCP"
 
-# Load Balancer (CLB) with single Availability Zone in us-west-1
-resource "aws_elb" "app_lb" {
-  count    = var.region == "us-east-1" ? 1 : 0
-  name               = "app-lb-${var.region}"
-  internal           = false
-  security_groups    = [aws_security_group.allow_lb_http.id]
-  subnets            = var.alb_subnet_ids
-  cross_zone_load_balancing = false  
-  listener {
-    lb_port           = 80
-    instance_port     = 80
-    protocol          = "HTTP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.nlb_target_group.arn
   }
+}
 
-  health_check {
-    target              = "HTTP:80/"
-    interval            = 10
-    timeout             = 5
-    unhealthy_threshold = 2
-    healthy_threshold   = 2
-  }
-
-  instances = [aws_instance.secondary_instance.id]
-
-  tags = {
-    Name = "app-lb-${var.region}"
-  }
+resource "aws_lb_target_group_attachment" "ip_target_attachment" {
+  target_group_arn = aws_lb_target_group.nlb_target_group.arn
+  target_id        = var.private_ip
+  port             = 80
 }
