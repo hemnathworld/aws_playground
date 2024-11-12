@@ -37,6 +37,16 @@ resource "aws_vpc_dhcp_options_association" "dhcp_options_association_secondary"
   dhcp_options_id = aws_vpc_dhcp_options.dhcp_options.id
 }
 
+# Route 53 CNAME Record for the Load Balancer
+resource "aws_route53_record" "primary_web_cname_record" {
+  zone_id = var.hosted_zone_id # Route 53 Hosted Zone ID
+  name    = "web.${var.private_zone_name}"  
+  type    = "CNAME"
+  ttl     = 10
+  records = [aws_lb.network_lb.dns_name] 
+}
+
+
 # Route 53 Alias Record to point to NLB
 resource "aws_route53_record" "primary_alias_record" {
   count    = var.region == "us-west-1" ? 1 : 0
