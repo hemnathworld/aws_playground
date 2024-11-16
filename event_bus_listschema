@@ -1,0 +1,11 @@
+aws events put-rule --name "TestRule" --event-bus-name "MyEventBus" --event-pattern '{"source": ["com.example.test"]}'
+
+aws events put-targets --rule "TestRule" --event-bus-name "MyEventBus" --targets "Id"="1","Arn"="arn:aws:logs:your-region:your-account-id:log-group:/aws/events/test-log-group"
+
+
+aws events put-events --entries '[{
+  "Source": "com.example.test",
+  "DetailType": "Test Event",
+  "Detail": "{ \"key\": \"value\" }",
+  "EventBusName": "MyEventBus"
+}]'

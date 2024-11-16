@@ -14,8 +14,19 @@ pip3 install flask-cors
 
 # Mount the S3 bucket using s3fs
 sudo mkdir /var/www/html/app
-s3fs hemtestbucket-hadr-us-east-1 /var/www/html/app -o iam_role=ec2_dynamo_s3_access_role -o allow_other
-chmod 755 /var/www/html/app/*
+
+# Mount the S3 bucket (replace 'your-bucket-name' accordingly)
+echo "<bucketname> /var/www/html/app fuse.s3fs _netdev,allow_other,iam_role=ec2_dynamo_s3_access_role,uid=www-data,gid=www-data,umask=0022 0 0" >> /etc/fstab
+
+# Mount the S3 bucket immediately
+mount -a
+
+# Set permissions on the mounted directory
+chmod -R 755 /var/www/html/app
+chown -R www-data:www-data /var/www/html/app
+
+
+
 
 # Create a simple Flask API application for DynamoDB access
 cat <<EOL > /var/www/html/customer_management.html
@@ -24,7 +35,7 @@ cat <<EOL > /var/www/html/customer_management.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Management - us-east-1 </title>
+    <title>Customer Management - us-gov-east-1 </title>
     <script>
         async function insertData() {
             const data = {
@@ -35,7 +46,7 @@ cat <<EOL > /var/www/html/customer_management.html
             };
 
             try {
-                const response = await fetch('http://172.31.91.64:5000/insert', {
+                const response = await fetch('http://<IP Address>:5000/insert', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -53,7 +64,7 @@ cat <<EOL > /var/www/html/customer_management.html
 
         async function fetchData() {
             try {
-                const response = await fetch('http://172.31.91.64:5000/read', {
+                const response = await fetch('http://<IP Address>:5000/read', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -80,7 +91,7 @@ cat <<EOL > /var/www/html/customer_management.html
     </script>
 </head>
 <body>
-    <h1>Customer Management - us-east-1</h1>
+    <h1>Customer Management - us-gov-east-1</h1>
 
     <h2>Add Customer</h2>
     <form onsubmit="event.preventDefault(); insertData();">
@@ -119,8 +130,8 @@ app = Flask(__name__)
 CORS(app)  # This will allow CORS for all routes
 
 # Initialize DynamoDB
-dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # Use primary region here
-table = dynamodb.Table('hem-dynamodbtable')  # Replace with your table name
+dynamodb = boto3.resource('dynamodb', region_name='us-gov-east-1')  # Use primary region here
+table = dynamodb.Table('<dynamodb table name>')  # Replace with your table name
 
 @app.route('/insert', methods=['POST'])
 def insert_data():
@@ -158,4 +169,23 @@ EOL
 
 # Make the Flask app executable and run it
 chmod +x /var/www/html/app.py
-nohup python3 /var/www/html/app.py &
+
+# Create the systemd service file
+cat <<EOF > /etc/systemd/system/flask-app.service
+[Unit]
+Description=Flask App Service
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/html
+ExecStart=/usr/bin/python3 /var/www/html/app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd, enable, and start the Flask service
+systemctl daemon-reload
+systemctl enable flask-app.service
+systemctl start flask-app.service
