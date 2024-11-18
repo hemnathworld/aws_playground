@@ -18,14 +18,33 @@ resource "google_storage_bucket_object" "app_code" {
 }
 
 resource "google_app_engine_standard_app_version" "app_version" {
+  count    = var.region == "us-west1" ? 1 : 0
   service  = "default"
   version_id = "v1"
   runtime   = "python310"
-  entrypoint = "python main.py"
+  entrypoint = {
+    shell = "python main_us-west1.py"
+  }
 
   deployment {
     zip {
-      source = google_storage_bucket_object.app_code.source
+      source_url = google_storage_bucket_object.app_code.source
+    }
+  }
+}
+
+resource "google_app_engine_standard_app_version" "app_version" {
+  count    = var.region == "us-east1" ? 1 : 0
+  service  = "default"
+  version_id = "v1"
+  runtime   = "python310"
+  entrypoint = {
+    shell = "python main_us-east1.py"
+  }
+
+  deployment {
+    zip {
+      source_url = google_storage_bucket_object.app_code.source
     }
   }
 }
