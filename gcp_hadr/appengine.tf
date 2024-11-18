@@ -22,7 +22,7 @@ resource "google_app_engine_standard_app_version" "app_version" {
   service  = "default"
   version_id = "v1"
   runtime   = "python310"
-  entrypoint = {
+  entrypoint {
     shell = "python main_us-west1.py"
   }
 
@@ -38,7 +38,7 @@ resource "google_app_engine_standard_app_version" "app_version" {
   service  = "default"
   version_id = "v1"
   runtime   = "python310"
-  entrypoint = {
+  entrypoint {
     shell = "python main_us-east1.py"
   }
 
