@@ -17,7 +17,7 @@ resource "google_storage_bucket_object" "app_code" {
   source = "${path.module}/sample_app"
 }
 
-resource "google_app_engine_standard_app_version" "app_version" {
+resource "google_app_engine_standard_app_version" "app_version_primary" {
   count    = var.region == "us-west1" ? 1 : 0
   service  = "default"
   version_id = "v1"
@@ -33,7 +33,7 @@ resource "google_app_engine_standard_app_version" "app_version" {
   }
 }
 
-resource "google_app_engine_standard_app_version" "app_version" {
+resource "google_app_engine_standard_app_version" "app_version_secondary" {
   count    = var.region == "us-east1" ? 1 : 0
   service  = "default"
   version_id = "v1"
