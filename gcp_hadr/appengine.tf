@@ -11,6 +11,12 @@ resource "google_project_iam_member" "app_engine_sa_storage_access" {
   member  = "serviceAccount:${google_service_account.app_engine_sa.email}"
 }
 
+resource "google_storage_bucket_iam_member" "cloud_build_access" {
+  bucket = "staging.${var.project_id}.appspot.com"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${var.project_id}@appspot.gserviceaccount.com"
+}
+
 # Create App Engine in each region
 resource "google_app_engine_application" "app" {
   location_id = var.region
