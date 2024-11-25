@@ -1,4 +1,3 @@
-
 resource "google_compute_instance_template" "template-west1" {
   count    = var.region == "us-west1" ? 1 : 0
   name        = "instance-template-west1"
