@@ -29,7 +29,7 @@ variable "lb_subnet_id" {
   type        = string
 }
 
-variable "ip_address" {
-  description = "Subnet ID for the internal load balancer"
+variable "lb_ip_address" {
+  description = "IP Address for the internal load balancer"
   type        = string
 }
