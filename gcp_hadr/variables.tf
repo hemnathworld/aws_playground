@@ -13,3 +13,23 @@ variable "bucket_name" {
   description = "The name of the Cloud Storage bucket"
   type        = string
 }
+
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
+}
+
+variable "subnet_id" {
+  description = "Subnet ID for the instance"
+  type        = string
+}
+
+variable "lb_subnet_id" {
+  description = "Subnet ID for the internal load balancer"
+  type        = string
+}
+
+variable "ip_address" {
+  description = "Subnet ID for the internal load balancer"
+  type        = string
+}
