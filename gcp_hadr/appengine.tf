@@ -11,6 +11,11 @@ resource "google_project_iam_member" "app_engine_sa_storage_access" {
   member  = "serviceAccount:${google_service_account.app_engine_sa.email}"
 }
 
+resource "google_app_engine_application" "app" {
+  project     = var.project_id
+  location_id = var.region
+}
+
 # Upload app source code to Cloud Storage
 resource "google_storage_bucket_object" "app_code_primary" {
   count    = var.region == "us-west1" ? 1 : 0
