@@ -1,4 +1,5 @@
 resource "google_backup_dr_backup_vault" "backup-vault-test" {
+  count    = var.region == "us-west4" ? 1 : 0
   provider     = google-beta
   location = var.region
   backup_vault_id  = "gcp-hadr-backup-vault"
@@ -6,6 +7,7 @@ resource "google_backup_dr_backup_vault" "backup-vault-test" {
 }
 
 resource "google_backup_dr_backup_plan" "backup-plan" {
+  count    = var.region == "us-west4" ? 1 : 0
   provider     = google-beta
   location       = var.region
   backup_plan_id = "gcp-hadr-backup-plan"
@@ -31,6 +33,7 @@ resource "google_backup_dr_backup_plan" "backup-plan" {
 
 # Create a compute instance
 resource "google_compute_instance" "vm_instance" {
+  count    = var.region == "us-west4" ? 1 : 0
   name         = "gcp-instance-test-backup"
   machine_type = "e2-micro"
   zone         = "us-west1-b"
@@ -48,6 +51,7 @@ resource "google_compute_instance" "vm_instance" {
 }
 
 resource "google_backup_dr_backup_plan_association" "backup-plan-association" {
+  count    = var.region == "us-west4" ? 1 : 0
   provider     = google-beta
   location = var.region
   resource_type= "compute.googleapis.com/Instance"
