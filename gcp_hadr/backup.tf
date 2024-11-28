@@ -1,9 +1,3 @@
-data "google_compute_instance" "vm_instance" {
-  name    = var.vm_name
-  zone    = var.zone
-  project = var.project_id
-}
-
 resource "google_backup_dr_backup_vault" "backup-vault-test" {
   provider     = google-beta
   location = var.region
@@ -35,11 +29,29 @@ resource "google_backup_dr_backup_plan" "backup-plan" {
   }
 }
 
+# Create a compute instance
+resource "google_compute_instance" "vm_instance" {
+  name         = "gcp-instance-test-backup"
+  machine_type = "e2-micro"
+  zone         = "us-west1-b"
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {}
+  }
+}
+
 resource "google_backup_dr_backup_plan_association" "backup-plan-association" {
   provider     = google-beta
   location = var.region
   resource_type= "compute.googleapis.com/Instance"
   backup_plan_association_id          = "gcp-hadr-backup-plan-association"
-  resource      = data.google_compute_instance.vm_instance.id
+  resource      = google_compute_instance.vm_instance.id
   backup_plan  = google_backup_dr_backup_plan.backup-plan.name
 }
