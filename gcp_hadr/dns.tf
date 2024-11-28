@@ -1,41 +1,41 @@
-resource "google_dns_managed_zone" "dns_zone" {
-  count    = var.region == "us-west1" ? 1 : 0
-  name        = "hadr-gcp-dns"
-  dns_name    = var.domain_name
-  description = "Managed DNS zone for failover setup"
-  project     = var.project_id
-  visibility = "private"
-  private_visibility_config {
-    networks {
-      network_url = google_compute_network.vpc-west1[count.index].id
-    }
-  }
+data "google_compute_instance" "primary_vm" {
+  name     = "gcp-hadr-web-primary"
+  zone     = "us-west4-b"
+  project  = var.hub_project_id
 }
 
-resource "google_dns_record_set" "a" {
-  count    = var.region == "us-west1" ? 1 : 0
-  name         = "app.${google_dns_managed_zone.dns_zone[count.index].dns_name}"
-  managed_zone = google_dns_managed_zone.dns_zone[count.index].name
+data "google_compute_instance" "secondary_vm" {
+  provider = google-beta
+  name     = "gcp-hadr-web-secondary"
+  zone     = "us-east4-b"
+  project  = var.hub_project_id
+}
+
+resource "google_dns_managed_zone" "dns_zone" {
+  count       = var.region == "us-west1" ? 1 : 0
+  name        = "hadr-gcp-dns"
+  dns_name    = var.name
+  description = "Managed DNdomain_S zone for failover setup"
+  project     = var.project_id
+  visibility  = "public"
+}
+
+resource "google_dns_record_set" "failover_record" {
+  name         = "web.${var.domain_name}"
+  managed_zone = google_dns_managed_zone.dns_zone[0].name
   type         = "A"
   ttl          = 10
 
-  routing_policy {
-    primary_backup {
-      primary {
-        internal_load_balancers {
-          ip_address         = google_compute_forwarding_rule.http_forwarding_rule-west1[count.index].ip_address
-          port               = "80"
-          ip_protocol        = "tcp"
-          network_url        = google_compute_network.vpc-west1[count.index].id
-          project            = google_compute_forwarding_rule.http_forwarding_rule-west1[count.index].project
-          region             = google_compute_forwarding_rule.http_forwarding_rule-west1[count.index].region
-        }
-      }
+  # Adding primary and failover configurations
+  rrdatas = [
+    data.google_compute_instance.primary_vm.network_interface[0].access_config[0].nat_ip, # Primary VM IP
+    data.google_compute_instance.secondary_vm.network_interface[0].access_config[0].nat_ip # Secondary VM IP
+  ]
 
-      backup_geo {
-        location = "us-east1"
-        rrdatas  = ["10.0.4.2"]
-      }
+  routing_policy {
+    geo {
+      primary_targets = [data.google_compute_instance.primary_vm.network_interface[0].access_config[0].nat_ip]
+      failover_targets = [data.google_compute_instance.secondary_vm.network_interface[0].access_config[0].nat_ip]
     }
   }
 }
