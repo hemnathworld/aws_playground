@@ -34,8 +34,8 @@ resource "google_dns_record_set" "failover_record" {
 
   routing_policy {
     geo {
-      primary_targets = [data.google_compute_instance.primary_vm.network_interface[0].access_config[0].nat_ip]
-      failover_targets = [data.google_compute_instance.secondary_vm.network_interface[0].access_config[0].nat_ip]
+        location = "us-east4"
+        rrdatas  =  [data.google_compute_instance.secondary_vm.network_interface[0].access_config[0].nat_ip]
     }
   }
 }
