@@ -3,21 +3,21 @@ variable "region" {
   type        = string
 }
 
-variable "source_bucket_name" {
+variable "us_west_bucket_name" {
   description = "Name of the Cloud Storage primary bucket"
   type        = string
 }
 
-variable "target_bucket_name" {
+variable "us_east_bucket_name" {
   description = "Name of the Cloud Storage secondary bucket"
   type        = string
 }
 
-variable "source_project_id" {
+variable "us_west_project_id" {
   type = string
 }
 
-variable "target_project_id" {
+variable "us_east_project_id" {
   type = string
 }
 
@@ -31,7 +31,7 @@ variable "subscriber_name" {
   type        = string
 }
 
-variable "target_project_number" {
+variable "us_east_project_number" {
   description = "Project Number of the secondary region"
   type        = number
 }
