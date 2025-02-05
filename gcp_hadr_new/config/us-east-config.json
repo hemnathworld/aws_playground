@@ -5,5 +5,6 @@
     "topic_name": "hemnathtesttopichadr",
     "subscriber_name": "hemnathtestsubscriber",
     "source_project_id": "gcphadruswest",
-    "source_bucket_name": "hemtestbucket-hadr-uswest"
+    "source_bucket_name": "hemtestbucket-hadr-uswest",
+    "target_project_number": "303082797220"
 }
