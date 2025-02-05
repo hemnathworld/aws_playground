@@ -25,7 +25,7 @@ resource "google_storage_bucket" "primary_bucket" {
 resource "google_pubsub_topic" "my_topic" {
   count    = var.region == "us-west1" ? 1 : 0
   name    = var.topic_name
-  project = var.project_id
+  project = var.source_project_id
 }
 
 resource "google_pubsub_topic_iam_binding" "pubsub_binding" {
@@ -39,24 +39,15 @@ resource "google_pubsub_topic_iam_binding" "pubsub_binding" {
 
 resource "google_project_iam_member" "grant_pubsub_subscriber" {
   count    = var.region == "us-west1" ? 1 : 0
-  project = var.project_id  # Project A
+  project = var.source_project_id  # Project A
   role    = "roles/pubsub.subscriber"
   member  = "serviceAccount:project-${var.secondary_project_number}@storage-transfer-service.iam.gserviceaccount.com"
 }
 
-# Grant the Pub/Sub Subscriber role to the service account from Project B
-#resource "google_pubsub_topic_iam_member" "grant_subscriber" {
-#  count    = var.region == "us-west1" ? 1 : 0
-#  project = var.project_id  # Project A
-#  topic  = var.topic_name
-#  role   = "roles/pubsub.subscriber"
-#  member = "serviceAccount:project-${var.secondary_project_number}@storage-transfer-service.iam.gserviceaccount.com"  # Service Account in Project B
-#}
-
 resource "google_pubsub_subscription" "transfer_subscription" {
   count    = var.region == "us-west1" ? 1 : 0
   name  = var.subscriber_name
-  topic = "projects/${var.project_id}/topics/${var.topic_name}"
+  topic = "projects/${var.source_project_id}/topics/${var.topic_name}"
   ack_deadline_seconds = 20
 }
 
