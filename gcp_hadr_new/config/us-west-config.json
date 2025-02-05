@@ -1,10 +1,10 @@
 {
     "region": "us-west1",
-    "source_bucket_name": "hemtestbucket-hadr-uswest",
-    "source_project_id": "gcphadruswest",
+    "us_west_bucket_name": "hemtestbucket-hadr-uswest",
+    "us_west_project_id": "gcphadruswest",
     "topic_name": "hemnathtesttopichadr",
     "subscriber_name": "hemnathtestsubscriber",
-    "target_project_number": "303082797220",
-    "target_bucket_name": "hemtestbucket-hadr-useast",
-    "target_project_id": "gcphadruseast"
+    "us_east_project_number": "303082797220",
+    "us_east_bucket_name": "hemtestbucket-hadr-useast",
+    "us_east_project_id": "gcphadruseast"
 }
