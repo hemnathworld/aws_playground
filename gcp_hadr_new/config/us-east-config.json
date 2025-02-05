@@ -1,0 +1,9 @@
+{
+    "region": "us-east1",
+    "bucket_name": "hemtestbucket-hadr-useast",
+    "project_id": "gcphadruseast",
+    "topic_name": "hemnathtesttopichadr",
+    "subscriber_name": "hemnathtestsubscriber",
+    "source_project_id": "gcphadruswest",
+    "source_bucket_name": "hemtestbucket-hadr-uswest"
+}
