@@ -4,5 +4,7 @@
     "source_project_id": "gcphadruswest",
     "topic_name": "hemnathtesttopichadr",
     "subscriber_name": "hemnathtestsubscriber",
-    "target_project_number": "303082797220"
+    "target_project_number": "303082797220",
+    "target_bucket_name": "hemtestbucket-hadr-useast",
+    "target_project_id": "gcphadruseast"
 }
