@@ -2,7 +2,7 @@ data "google_storage_project_service_account" "gcs_account" {}
 
 resource "google_storage_bucket" "primary_bucket" {
   count    = var.region == "us-west1" ? 1 : 0
-  name     = var.bucket_name
+  name     = var.source_bucket_name
   location = var.region
   storage_class = "STANDARD"
   uniform_bucket_level_access = true
@@ -74,7 +74,7 @@ resource "google_storage_notification" "storage_notification" {
 
 resource "google_storage_bucket" "secondary_bucket" {
   count    = var.region == "us-east1" ? 1 : 0
-  name     = var.bucket_name
+  name     = var.target_bucket_name
   location = var.region
   storage_class = "STANDARD"
   uniform_bucket_level_access = true
@@ -105,7 +105,7 @@ resource "google_storage_transfer_job" "storage_transfer" {
     }
 
     gcs_data_sink {
-      bucket_name = var.bucket_name  # Replace with your destination bucket
+      bucket_name = var.target_bucket_name  # Replace with your destination bucket
     }
 
     transfer_options {
