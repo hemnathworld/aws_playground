@@ -88,7 +88,7 @@ resource "google_storage_bucket" "secondary_bucket" {
 resource "google_storage_transfer_job" "storage_transfer" {
   count    = var.region == "us-east1" ? 1 : 0
   description = "Storage Transfer Job"
-  project = var.project_id
+  project = var.target_project_id
 
   transfer_spec {
     gcs_data_source {
