@@ -41,7 +41,7 @@ resource "google_project_iam_member" "grant_pubsub_subscriber" {
   count    = var.region == "us-west1" ? 1 : 0
   project = var.source_project_id  # Project A
   role    = "roles/pubsub.subscriber"
-  member  = "serviceAccount:project-${var.secondary_project_number}@storage-transfer-service.iam.gserviceaccount.com"
+  member  = "serviceAccount:project-${var.target_project_number}@storage-transfer-service.iam.gserviceaccount.com"
 }
 
 resource "google_pubsub_subscription" "transfer_subscription" {
