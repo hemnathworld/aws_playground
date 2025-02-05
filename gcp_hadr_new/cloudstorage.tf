@@ -2,7 +2,7 @@ data "google_storage_project_service_account" "gcs_account" {}
 
 resource "google_storage_bucket" "primary_bucket" {
   count    = var.region == "us-west1" ? 1 : 0
-  name     = var.source_bucket_name
+  name     = var.us_west_bucket_name
   location = var.region
   storage_class = "STANDARD"
   uniform_bucket_level_access = true
@@ -25,7 +25,7 @@ resource "google_storage_bucket" "primary_bucket" {
 resource "google_pubsub_topic" "my_topic" {
   count    = var.region == "us-west1" ? 1 : 0
   name    = var.topic_name
-  project = var.source_project_id
+  project = var.us_west_project_id
 }
 
 resource "google_pubsub_topic_iam_binding" "pubsub_binding" {
@@ -39,7 +39,7 @@ resource "google_pubsub_topic_iam_binding" "pubsub_binding" {
 
 resource "google_project_iam_member" "grant_pubsub_subscriber" {
   count    = var.region == "us-west1" ? 1 : 0
-  project = var.source_project_id  # Project A
+  project = var.us_west_project_id  # Project A
   role    = "roles/pubsub.subscriber"
   member  = "serviceAccount:project-${var.target_project_number}@storage-transfer-service.iam.gserviceaccount.com"
 }
@@ -47,7 +47,7 @@ resource "google_project_iam_member" "grant_pubsub_subscriber" {
 resource "google_pubsub_subscription" "transfer_subscription" {
   count    = var.region == "us-west1" ? 1 : 0
   name  = var.subscriber_name
-  topic = "projects/${var.source_project_id}/topics/${var.topic_name}"
+  topic = "projects/${var.us_west_project_id}/topics/${var.topic_name}"
   ack_deadline_seconds = 20
 }
 
@@ -65,7 +65,7 @@ resource "google_storage_notification" "storage_notification" {
 
 resource "google_storage_bucket" "secondary_bucket" {
   count    = var.region == "us-east1" ? 1 : 0
-  name     = var.target_bucket_name
+  name     = var.us_east_bucket_name
   location = var.region
   storage_class = "STANDARD"
   uniform_bucket_level_access = true
@@ -88,15 +88,15 @@ resource "google_storage_bucket" "secondary_bucket" {
 resource "google_storage_transfer_job" "storage_transfer" {
   count    = var.region == "us-east1" ? 1 : 0
   description = "Storage Transfer Job"
-  project = var.target_project_id
+  project = var.us_east_project_id
 
   transfer_spec {
     gcs_data_source {
-      bucket_name = var.source_bucket_name # Replace with your source bucket
+      bucket_name = var.us_west_bucket_name # Replace with your source bucket
     }
 
     gcs_data_sink {
-      bucket_name = var.target_bucket_name  # Replace with your destination bucket
+      bucket_name = var.us_east_bucket_name  # Replace with your destination bucket
     }
 
     transfer_options {
@@ -106,6 +106,6 @@ resource "google_storage_transfer_job" "storage_transfer" {
 
   # Event-driven trigger using Pub/Sub
   event_stream {
-    name = "projects/${var.source_project_id}/subscriptions/${var.subscriber_name}"
+    name = "projects/${var.us_west_project_id}/subscriptions/${var.subscriber_name}"
   }
 } 
