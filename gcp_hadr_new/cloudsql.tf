@@ -44,7 +44,50 @@ resource "google_sql_database" "secondary_database" {
 
 # Cloud Function to export SQL to GCS
 resource "google_storage_bucket_object" "cloud_function_code" {
+  count    = var.region == "us-west4" ? 1 : 0
   name   = "export_function.zip"
-  bucket = 
+  bucket = var.us_west_bucket_name
   source = "export_function.zip"  # Ensure this zip file exists locally
+}
+
+resource "google_cloudfunctions_function" "export_function" {
+  count    = var.region == "us-west4" ? 1 : 0
+  name        = "export-sql-to-gcs"
+  runtime     = "python311"
+  region      = var.region
+  entry_point = "export_db"
+  
+  source_archive_bucket = google_storage_bucket.db_backup_bucket.name
+  source_archive_object = google_storage_bucket_object.cloud_function_code.name
+
+  event_trigger {
+    event_type = "google.pubsub.topic.publish"
+    resource   = google_pubsub_topic.sql_export_topic.id
+  }
+
+  environment_variables = {
+    SQL_INSTANCE  = google_sql_database_instance.sql_instance.name
+    DB_NAME       = google_sql_database.database.name
+    GCS_BUCKET    = google_storage_bucket.db_backup_bucket.name
+  }
+}
+
+# Pub/Sub Topic for triggering Cloud Function
+resource "google_pubsub_topic" "sql_export_topic" {
+  count    = var.region == "us-west4" ? 1 : 0
+  name = "sql-export-topic"
+}
+
+# Cloud Scheduler Job to trigger Cloud Function every 30 minutes
+resource "google_cloud_scheduler_job" "export_scheduler" {
+  count    = var.region == "us-west4" ? 1 : 0
+  name        = "sql-export-job"
+  region      = var.region
+  schedule    = "*/30 * * * *"  # Runs every 30 minutes
+  time_zone   = "UTC"
+
+  pubsub_target {
+    topic_name = google_pubsub_topic.sql_export_topic.id
+    data       = base64encode("Trigger Cloud SQL Export")
+  }
 }
