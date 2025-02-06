@@ -42,3 +42,9 @@ resource "google_sql_database" "secondary_database" {
   instance = google_sql_database_instance.secondary_sql_instance.name
 }
 
+# Cloud Function to export SQL to GCS
+resource "google_storage_bucket_object" "cloud_function_code" {
+  name   = "export_function.zip"
+  bucket = 
+  source = "export_function.zip"  # Ensure this zip file exists locally
+}
