@@ -1,3 +1,18 @@
+resource "google_compute_global_address" "primary_private_ip_range" {
+  count    = var.region == "us-west4" ? 1 : 0
+  name          = "private-ip-range"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = <>
+}
+
+resource "google_service_networking_connection" "primary_private_vpc_connection" {
+  network       = <>
+  service       = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.primary_private_ip_range.name]
+}
+
 resource "google_sql_database_instance" "primary_sql_instance" {
   count    = var.region == "us-west4" ? 1 : 0
   name             = var.db_instance_name
