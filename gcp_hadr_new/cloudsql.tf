@@ -14,13 +14,13 @@ resource "google_sql_database_instance" "primary_sql_instance" {
 }
 
 # Cloud SQL Database
-resource "google_sql_database" "database" {
+resource "google_sql_database" "primary_database" {
   count    = var.region == "us-west4" ? 1 : 0
   name     = "myprimarydatabase"
   instance = google_sql_database_instance.sql_instance.name
 }
 
-resource "google_sql_database_instance" "sql_instance" {
+resource "google_sql_database_instance" "secondary_sql_instance" {
   count    = var.region == "us-east4" ? 1 : 0
   name             = "secondary-db-instance"
   database_version = "MYSQL_8_0"
@@ -36,9 +36,9 @@ resource "google_sql_database_instance" "sql_instance" {
 }
 
 # Cloud SQL Database
-resource "google_sql_database" "database" {
-  count    = var.region == "us-west4" ? 1 : 0
-  name     = "myprimarydatabase"
+resource "google_sql_database" "secondary_database" {
+  count    = var.region == "us-east4" ? 1 : 0
+  name     = "mysecondarydatabase"
   instance = google_sql_database_instance.sql_instance.name
 }
 
