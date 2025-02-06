@@ -6,6 +6,10 @@ resource "google_sql_database_instance" "primary_sql_instance" {
 
   settings {
     tier = "db-f1-micro" # Change to appropriate machine type
+    ip_configuration {
+      ipv4_enabled    = false   # Disable External IP
+      private_network = <>
+    }
     backup_configuration {
       enabled            = true
       point_in_time_recovery_enabled = true
@@ -28,6 +32,10 @@ resource "google_sql_database_instance" "secondary_sql_instance" {
 
   settings {
     tier = "db-f1-micro" # Change to appropriate machine type
+    ip_configuration {
+      ipv4_enabled    = false   # Disable External IP
+      private_network = <>
+    }
     backup_configuration {
       enabled            = true
       point_in_time_recovery_enabled = true
@@ -57,7 +65,7 @@ resource "google_cloudfunctions_function" "export_function" {
   region      = var.region
   entry_point = "export_db"
   
-  source_archive_bucket = google_storage_bucket.db_backup_bucket.name
+  source_archive_bucket = var.us_west_bucket_name
   source_archive_object = google_storage_bucket_object.cloud_function_code.name
 
   event_trigger {
@@ -68,7 +76,7 @@ resource "google_cloudfunctions_function" "export_function" {
   environment_variables = {
     SQL_INSTANCE  = google_sql_database_instance.sql_instance.name
     DB_NAME       = google_sql_database.database.name
-    GCS_BUCKET    = google_storage_bucket.db_backup_bucket.name
+    GCS_BUCKET    = var.us_west_bucket_name
   }
 }
 
