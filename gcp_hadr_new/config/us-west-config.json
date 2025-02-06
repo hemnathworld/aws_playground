@@ -6,5 +6,7 @@
     "subscriber_name": "hemnathtestsubscriber",
     "us_east_project_number": "303082797220",
     "us_east_bucket_name": "hemtestbucket-hadr-useast",
-    "us_east_project_id": "gcphadruseast"
+    "us_east_project_id": "gcphadruseast",
+    "db_instance_name": "secondary-db-instance",
+    "db_name": "mysecondarydatabase"
 }
