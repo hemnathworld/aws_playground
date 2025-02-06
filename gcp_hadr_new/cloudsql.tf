@@ -8,7 +8,7 @@ resource "google_sql_database_instance" "primary_sql_instance" {
     tier = "db-f1-micro" # Change to appropriate machine type
     ip_configuration {
       ipv4_enabled    = false   # Disable External IP
-      private_network = <>
+      private_network = "projects/{{project}}/global/networks/{{name}}"
     }
     backup_configuration {
       enabled            = true
