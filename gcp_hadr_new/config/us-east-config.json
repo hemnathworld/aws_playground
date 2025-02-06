@@ -7,6 +7,6 @@
     "us_west_project_id": "gcphadruswest",
     "us_west_bucket_name": "hemtestbucket-hadr-uswest",
     "us_east_project_number": "303082797220",
-    "db_instance_name" : "primary-db-instance",
-    
+    "db_instance_name": "secondary-db-instance",
+    "db_name": "mysecondarydatabase"
 }
