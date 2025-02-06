@@ -17,7 +17,7 @@ resource "google_sql_database_instance" "primary_sql_instance" {
 resource "google_sql_database" "primary_database" {
   count    = var.region == "us-west4" ? 1 : 0
   name     = var.db_name
-  instance = google_sql_database_instance.sql_instance.name
+  instance = google_sql_database_instance.primary_sql_instance.name
 }
 
 resource "google_sql_database_instance" "secondary_sql_instance" {
@@ -39,6 +39,6 @@ resource "google_sql_database_instance" "secondary_sql_instance" {
 resource "google_sql_database" "secondary_database" {
   count    = var.region == "us-east4" ? 1 : 0
   name     = var.db_name
-  instance = google_sql_database_instance.sql_instance.name
+  instance = google_sql_database_instance.secondary_sql_instance.name
 }
 
