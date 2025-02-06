@@ -35,3 +35,13 @@ variable "us_east_project_number" {
   description = "Project Number of the secondary region"
   type        = number
 }
+
+variable "db_instance_name" {
+  description = "The name of the DB instance"
+  type        = string
+}
+
+variable "db_name" {
+  description = "The name of the Database"
+  type        = string
+}
