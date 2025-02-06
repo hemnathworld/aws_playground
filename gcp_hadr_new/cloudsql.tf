@@ -90,8 +90,8 @@ resource "google_cloudfunctions_function" "export_function" {
   }
 
   environment_variables = {
-    SQL_INSTANCE  = google_sql_database_instance.sql_instance.name
-    DB_NAME       = google_sql_database.database.name
+    SQL_INSTANCE  = google_sql_database_instance.primary_sql_instance.name
+    DB_NAME       = google_sql_database.primary_database.name
     GCS_BUCKET    = var.us_west_bucket_name
   }
 }
