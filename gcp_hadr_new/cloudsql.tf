@@ -74,27 +74,65 @@ resource "google_storage_bucket_object" "cloud_function_code" {
   source = "export_function.zip"  # Ensure this zip file exists locally
 }
 
-resource "google_cloudfunctions_function" "export_function" {
+#resource "google_cloudfunctions_function" "export_function" {
+#  count    = var.region == "us-west4" ? 1 : 0
+#  name        = "export-sql-to-gcs"
+#  runtime     = "python311"
+#  region      = var.region
+#  entry_point = "export_db"
+#  
+#  source_archive_bucket = var.us_west_bucket_name
+#  source_archive_object = google_storage_bucket_object.cloud_function_code.name
+
+#  event_trigger {
+#    event_type = "google.pubsub.topic.publish"
+#    resource   = google_pubsub_topic.sql_export_topic.id
+#  }
+
+#  environment_variables = {
+#    SQL_INSTANCE  = google_sql_database_instance.primary_sql_instance.name
+#    DB_NAME       = google_sql_database.primary_database.name
+#    GCS_BUCKET    = var.us_west_bucket_name
+#  }
+#}
+
+resource "google_cloudfunctions2_function" "export_function" {
   count    = var.region == "us-west4" ? 1 : 0
-  name        = "export-sql-to-gcs"
-  runtime     = "python311"
-  region      = var.region
-  entry_point = "export_db"
-  
-  source_archive_bucket = var.us_west_bucket_name
-  source_archive_object = google_storage_bucket_object.cloud_function_code.name
+  name     = "export-sql-to-gcs"
+  location = var.region
+
+  build_config {
+    runtime     = "python311"
+    entry_point = "export_db"
+    source {
+      storage_source {
+        bucket = var.us_west_bucket_name
+        object = google_storage_bucket_object.cloud_function_code.name
+      }
+    }
+  }
+
+  service_config {
+    max_instance_count = 5
+    available_memory   = "512M"
+    timeout_seconds    = 60
+    ingress_settings   = "ALLOW_ALL"
+
+    environment_variables = {
+      SQL_INSTANCE  = google_sql_database_instance.primary_sql_instance.name
+      DB_NAME       = google_sql_database.primary_database.name
+      GCS_BUCKET    = var.us_west_bucket_name
+      GCP_PROJECT   = var.us_west_project_id
+    }
+  }
 
   event_trigger {
-    event_type = "google.pubsub.topic.publish"
-    resource   = google_pubsub_topic.sql_export_topic.id
-  }
-
-  environment_variables = {
-    SQL_INSTANCE  = google_sql_database_instance.primary_sql_instance.name
-    DB_NAME       = google_sql_database.primary_database.name
-    GCS_BUCKET    = var.us_west_bucket_name
+    trigger_region = var.region
+    event_type     = "google.cloud.pubsub.topic.v1.messagePublished"
+    pubsub_topic   = google_pubsub_topic.sql_export_topic.id
   }
 }
+
 
 # Pub/Sub Topic for triggering Cloud Function
 resource "google_pubsub_topic" "sql_export_topic" {
