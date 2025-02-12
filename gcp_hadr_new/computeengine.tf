@@ -9,6 +9,11 @@ resource "google_compute_instance_template" "template-west4" {
     }
   }
 
+  service_account {
+    email  = "${var.project_id}-compute@developer.gserviceaccount.com"  # Default SA
+    scopes = ["cloud-platform"]
+  }
+
   tags = ["http-server", "https-server"]
   disk {
     source_image      = "debian-cloud/debian-11"
