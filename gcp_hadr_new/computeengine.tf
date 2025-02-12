@@ -10,7 +10,7 @@ resource "google_compute_instance_template" "template-west4" {
   }
 
   service_account {
-    email  = "${var.project_id}-compute@developer.gserviceaccount.com"  # Default SA
+    email  = "${var.us_west_project_id}-compute@developer.gserviceaccount.com"  # Default SA
     scopes = ["cloud-platform"]
   }
 
