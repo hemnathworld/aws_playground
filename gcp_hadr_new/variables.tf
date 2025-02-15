@@ -67,3 +67,9 @@ variable "host_project_id" {
   description = "Host Project ID"
   type        = string
 }
+
+variable "dns_zone_name" {
+  description = "DNS Zone name"
+  type        = string
+}
+
