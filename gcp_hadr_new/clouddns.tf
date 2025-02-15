@@ -40,10 +40,17 @@ resource "google_dns_record_set" "dns_failover" {
   routing_policy {
     primary_backup {
       primary {
-        address = data.google_compute_global_address.us_west_ip.address
+        external_endpoints {
+          ip_address = data.google_compute_forwarding_rule.us_west_forwarding_rule.ip_address
+        }
       }
-      backup {
-        address = data.google_compute_global_address.us_east_ip.address
+      secondary {
+        external_endpoints {
+          ip_address = data.google_compute_forwarding_rule.us_east_forwarding_rule.ip_address
+        }
+        health_checked_targets {
+          health_check = google_compute_health_check.http_health_check.id
+        }
       }
     }
   }
