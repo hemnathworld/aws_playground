@@ -55,3 +55,5 @@ resource "google_dns_record_set" "dns_failover" {
     }
   }
 }
+
+│ Error: Error updating HealthCheck "projects/sbx-connectivity-1v9u/global/healthChecks/http-health-check": googleapi: Error 400: Invalid value for field 'resource.sourceRegions': 'us-east4,us-central1,us-west4'. Source region list must stay empty., invalid
