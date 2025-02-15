@@ -38,18 +38,12 @@ resource "google_dns_record_set" "dns_failover" {
   managed_zone = var.dns_zone_name
 
   routing_policy {
-    health_check = google_compute_health_check.http-health-check.id
     primary_backup {
-
       primary {
-        external_endpoints = [data.google_compute_forwarding_rule.us_west_forwarding_rule.ipaddress]
+        address = data.google_compute_global_address.us_west_ip.address
       }
-
-      backup_geo {
-        location = "us-west4"
-        health_checked_targets {
-          external_endpoints = [data.google_compute_forwarding_rule.us_east_forwarding_rule.ipaddress]
-        }
+      backup {
+        address = data.google_compute_global_address.us_east_ip.address
       }
     }
   }
