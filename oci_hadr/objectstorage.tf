@@ -12,7 +12,6 @@ resource "oci_objectstorage_bucket" "source_bucket" {
 
 resource "oci_objectstorage_bucket" "target_bucket" {
   count    = var.region == "us-langley-1" ? 1 : 0  ## East 
-  provider       = oci.target_region
   compartment_id = var.compartment_id
   name           = var.bucket_name
   namespace      = data.oci_objectstorage_namespace.ns.namespace
