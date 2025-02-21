@@ -1,4 +1,5 @@
 resource "oci_database_db_system" "source_database" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
   compartment_id       = var.compartment_id
   availability_domain  = var.availability_domain
   display_name         = "BaseDBSystem"
