@@ -19,6 +19,17 @@ resource "oci_objectstorage_bucket" "target_bucket" {
   storage_tier   = "Standard"
 }
 
+resource "oci_identity_policy" "replication_policy" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
+  name           = var.bucket_policy_name
+  description    = "Policy to allow object storage replication across regions"
+  compartment_id = var.compartment_id
+
+  statements = [
+    "allow service objectstorage-${var.region} to manage object-family in compartment id ${var.compartment_id}"
+  ]
+}
+
 resource "oci_objectstorage_replication_policy" "replication_policy" {
   count    = var.region == "us-luke-1" ? 1 : 0  ## West
   bucket = var.bucket_name
