@@ -1,6 +1,7 @@
 data "oci_core_instance" "langley_instance" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
   compartment_id = var.compartment_id
-  display_name   = "langley-web-instance"  # Ensure this is the correct instance name
+  display_name   = "secondary-web-server"  # Ensure this is the correct instance name
 }
 
 resource "oci_load_balancer" "web_lb" {
@@ -30,6 +31,7 @@ resource "oci_load_balancer_backend_set" "web_backend_set" {
 
 # Use Dynamic Backend IPs from VM Instances
 resource "oci_load_balancer_backend" "backend_luke" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
   load_balancer_id = oci_load_balancer.web_lb.id
   backend_set_name = oci_load_balancer_backend_set.web_backend_set.name
   ip_address       = oci_core_instance.luke_instance.private_ip
@@ -38,14 +40,16 @@ resource "oci_load_balancer_backend" "backend_luke" {
 }
 
 resource "oci_load_balancer_backend" "backend_langley" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
   load_balancer_id = oci_load_balancer.web_lb.id
   backend_set_name = oci_load_balancer_backend_set.web_backend_set.name
-  ip_address       = oci_core_instance.langley_instance.private_ip
+  ip_address       = data.oci_core_instance.langley_instance.private_ip
   port             = 80
   weight           = 1
 }
 
 resource "oci_load_balancer_listener" "web_listener" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
   load_balancer_id        = oci_load_balancer.web_lb.id
   name                    = "web-listener"
   default_backend_set_name = oci_load_balancer_backend_set.web_backend_set.name
