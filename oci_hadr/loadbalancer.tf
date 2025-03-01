@@ -1,5 +1,10 @@
+data "oci_core_instance" "langley_instance" {
+  compartment_id = var.compartment_id
+  display_name   = "langley-web-instance"  # Ensure this is the correct instance name
+}
+
 resource "oci_load_balancer" "web_lb" {
-  
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
   compartment_id = var.compartment_id
   display_name   = "web-load-balancer"
   shape         = var.lb_shape
@@ -7,6 +12,7 @@ resource "oci_load_balancer" "web_lb" {
 }
 
 resource "oci_load_balancer_backend_set" "web_backend_set" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
   name             = "web-backend-set"
   load_balancer_id = oci_load_balancer.web_lb.id
   policy           = "ROUND_ROBIN"
