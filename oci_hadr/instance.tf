@@ -24,6 +24,10 @@ resource "oci_core_instance" "primary_vm" {
   }
 
   display_name = "primary-web-server"
+  shape_config {
+    ocpus = 2
+    memory_in_gbs = 16
+}
 }
 
 resource "oci_core_instance" "secondary_vm" {
