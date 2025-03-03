@@ -23,7 +23,9 @@ resource "google_compute_instance_template" "template-west4" {
   metadata = {
     startup-script = templatefile("${path.module}/scripts/us-west4-script.sh", {PROJECT_ID = var.project_id})
   }
-
+  shape_config {
+    ocpus = 2
+    memory_in_gbs = 16
 }
 
 resource "google_compute_instance_group_manager" "group-west4" {
