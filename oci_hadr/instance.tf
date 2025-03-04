@@ -27,7 +27,7 @@ resource "oci_core_instance" "primary_vm" {
   }
 
   metadata = {
-    ssh_authorized_keys = file("~/.ssh/id_rsa.pub")
+    ssh_authorized_keys =  [tls_private_key.primary_instance_ssh_key.public_key_openssh]
     user_data           = base64encode(file("scripts/us_west.sh"))
   }
 
