@@ -1,6 +1,14 @@
-data "oci_core_subnet" "primary_external_subnet" {
-  compartment_id = var.connectivity_compartment_id  # Use a connectivity compartment
-  subnet_id      = var.subnet_id       # Pass the OCID of the connectivity subnet
+resource "tls_private_key" "primary_instance_ssh_key" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "local_file" "primary_private_key" {
+  count    = var.region == "us-luke-1" ? 1 : 0  ## West
+  content  = tls_private_key.primary_instance_ssh_key.private_key_pem
+  filename = "${path.module}/primary_instance_private_key.pem"
+  file_permission = "0600"
 }
 
 resource "oci_core_instance" "primary_vm" {
