@@ -4,14 +4,8 @@ data "oci_core_instance" "langley_instance" {
   display_name   = "secondary-web-server"  # Ensure this is the correct instance name
 }
 
-data "oci_core_vnic_attachments" "langley_instance_vnic_attachments" {
-  compartment_id = var.compartment_id
-  availability_domain = ""
+data "oci_core_instance" "langley_instance_vnic" {
   instance_id = data.oci_core_instance.langley_instance.id
-}
-
-data "oci_core_vnic" "langley_instance_vnic" {
-    vnic_id = data.oci_core_vnic_attachments.langley_instance_vnic_attachments.vnic_id
 }
 
 resource "oci_load_balancer" "web_lb" {
@@ -53,7 +47,7 @@ resource "oci_load_balancer_backend" "backend_langley" {
   count    = var.region == "us-luke-1" ? 1 : 0  ## West
   load_balancer_id = oci_load_balancer.web_lb.id
   backend_set_name = oci_load_balancer_backend_set.web_backend_set.name
-  ip_address       = data.oci_core_vnic.langley_instance_vnic.private_ip_address
+  ip_address       = data.oci_core_instance.langley_instance_vnic.private_ip
   port             = 80
   weight           = 1
 }
