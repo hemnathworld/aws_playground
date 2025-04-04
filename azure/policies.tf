@@ -31,8 +31,8 @@ resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   #parameters = jsonencode(lookup(var.policy_parameters, each.key, {}))
   parameters = <<PARAMETERS
 {
-  "allowedLocations": {
-    "value": [ "West Europe" ]
+  "bringYourOwnUserAssignedManagedIdentity": {
+    "value": [ "false" ]
   }
 }
 PARAMETERS
