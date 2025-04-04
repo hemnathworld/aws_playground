@@ -29,11 +29,9 @@ resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   description          = "This policy ensures that the Azure Monitor Agent is automatically installed on virtual machines."
   enforcement_mode     = "Default"
   #parameters = jsonencode(lookup(var.policy_parameters, each.key, {}))
-  parameters = <<PARAMETERS
-{
-  "bringYourOwnUserAssignedManagedIdentity": {
-    "value": [ "false" ]
-  }
-}
-PARAMETERS
+  parameters = jsonencode({
+    bringYourOwnUserAssignedManagedIdentity = {
+      value = false
+    }
+  })
 }
