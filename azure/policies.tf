@@ -12,7 +12,7 @@ data "azurerm_management_group" "my_management_group" {
 # Policy Assignment to enforce the deployment of Azure Monitor Agent at the management group level
 resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   for_each = data.azurerm_policy_definition.policy_definitions
-  name                 = "deploy-azure-monitor-agent"
+  name                 = "assignment-${each.key}"
   scope                = data.azurerm_management_group.my_management_group.id
   policy_definition_id = each.value.id
   display_name         = "Deploy Azure Monitor Agent on VMs"
