@@ -10,7 +10,7 @@ resource "random_id" "suffix" {
 
 # Data source to get the policy definition ID for the built-in policy
 data "azurerm_policy_definition_built_in" "monitor_agent" {
-  for_each = local.policy_map
+  for_each = toset(var.policy_names)
   display_name     = each.value
 }
 
