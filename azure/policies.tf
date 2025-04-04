@@ -26,3 +26,6 @@ resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   description          = "This policy ensures that the Azure Monitor Agent is automatically installed on virtual machines."
   enforcement_mode     = "Default"
 }
+
+
+az policy definition list --query "[].{name:name, displayName:displayName}"
