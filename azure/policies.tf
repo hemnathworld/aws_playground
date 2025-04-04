@@ -12,7 +12,7 @@ data "azurerm_management_group" "my_management_group" {
 locals {
   short_policy_names = {
     for name in var.policy_names :
-      name => replace(lower(join("-", slice(split(" ", name), 0, 4))), "[^a-z0-9-]", "")
+      name => replace(lower(join("-", slice(split(" ", name), 0, 2))), "[^a-z0-9-]", "")
   }
 }
 
