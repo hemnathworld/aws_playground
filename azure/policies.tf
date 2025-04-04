@@ -1,7 +1,17 @@
+# Create a map of policies
+locals {
+  policy_map = { for idx, name in var.policy_names : name => idx }
+}
+
+resource "random_id" "suffix" {
+  for_each = local.policy_map
+  byte_length = 2  # 2 bytes = 4 hex chars
+}
+
 # Data source to get the policy definition ID for the built-in policy
 data "azurerm_policy_definition_built_in" "monitor_agent" {
-  for_each = toset(var.policy_names)
-  name     = each.value
+  for_each = local.policy_map
+  display_name     = each.value
 }
 
 # Data source to get management group ID (you can replace this with your actual management group ID)
@@ -9,17 +19,10 @@ data "azurerm_management_group" "my_management_group" {
   name = var.env
 }
 
-locals {
-  short_policy_names = {
-    for name in var.policy_names :
-      name => replace(lower(join("-", slice(split(" ", name), 0, 2))), "[^a-z0-9-]", "")
-  }
-}
-
 # Policy Assignment to enforce the deployment of Azure Monitor Agent at the management group level
 resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   for_each = data.azurerm_policy_definition.policy_definitions
-  name                 = "asg-${local.short_policy_names[each.key]}"
+  name                 = "asg-${random_id.suffix[each.key].hex}"
   scope                = data.azurerm_management_group.my_management_group.id
   policy_definition_id = each.value.id
   display_name         = "Deploy Azure Monitor Agent on VMs"
