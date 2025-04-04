@@ -28,5 +28,12 @@ resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   display_name         = "Deploy Azure Monitor Agent on VMs"
   description          = "This policy ensures that the Azure Monitor Agent is automatically installed on virtual machines."
   enforcement_mode     = "Default"
-  parameters = jsonencode(lookup(var.policy_parameters, each.key, {}))
+  #parameters = jsonencode(lookup(var.policy_parameters, each.key, {}))
+  parameters = <<PARAMETERS
+{
+  "allowedLocations": {
+    "value": [ "West Europe" ]
+  }
+}
+PARAMETERS
 }
