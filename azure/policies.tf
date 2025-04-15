@@ -19,6 +19,88 @@ data "azurerm_management_group" "my_management_group" {
   name = var.env
 }
 
+resource "azurerm_user_assigned_identity" "example" {
+  name                = "ama-agent-identity"
+  resource_group_name = var.resourcegroupname
+  location            = var.location
+}
+
+resource "azurerm_monitor_data_collection_rule" "example" {
+  name                = "ama-crossplatform-dcr"
+  location            = var.resourcegroupname
+  resource_group_name = var.location
+
+  destinations {
+    log_analytics {
+      name                  = "amaloganalytics"
+      workspace_resource_id = var.workspaceid
+    }
+  }
+
+  data_flows {
+    streams      = ["Microsoft-Perf"]
+    destinations = ["amaloganalytics"]
+  }
+
+  data_flows {
+    streams      = ["Microsoft-Syslog"]
+    destinations = ["amaloganalytics"]
+  }
+
+  # Windows Performance Counters
+  data_sources {
+    performance_counter {
+      name                          = "windows-perf"
+      streams                       = ["Microsoft-Perf"]
+      sampling_frequency_in_seconds = 60
+      counter_specifiers            = [
+        "\\Processor(_Total)\\% Processor Time",
+        "\\Memory\\Available MBytes"
+      ]
+      filter_specification {
+        name   = "windowsFilter"
+        filter = "OS == 'Windows'"
+      }
+    }
+  }
+
+  # Linux Performance Counters
+  data_sources {
+    performance_counter {
+      name                          = "linux-perf"
+      streams                       = ["Microsoft-Perf"]
+      sampling_frequency_in_seconds = 60
+      counter_specifiers            = [
+        "\\LogicalDisk(/)\\% Free Space",
+        "\\Memory\\Available Bytes"
+      ]
+      filter_specification {
+        name   = "linuxFilter"
+        filter = "OS == 'Linux'"
+      }
+    }
+  }
+
+  # Linux Syslog Collection
+  data_sources {
+    syslog {
+      name    = "linux-syslog"
+      streams = ["Microsoft-Syslog"]
+      facility_names = [
+        "auth",
+        "cron",
+        "daemon",
+        "syslog"
+      ]
+      log_levels = ["Error", "Critical", "Alert", "Emergency"]
+      filter_specification {
+        name   = "syslogFilter"
+        filter = "OS == 'Linux'"
+      }
+    }
+  }
+}
+
 # Policy Assignment to enforce the deployment of Azure Monitor Agent at the management group level
 resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   for_each = data.azurerm_policy_definition.policy_definitions
@@ -31,7 +113,7 @@ resource "azurerm_policy_assignment" "monitor_agent_assignment" {
   #parameters = jsonencode(lookup(var.policy_parameters, each.key, {}))
   parameters = jsonencode({
     bringYourOwnUserAssignedManagedIdentity = {
-      value = false
+      value = true
     }
   })
 }
