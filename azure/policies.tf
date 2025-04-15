@@ -19,7 +19,7 @@ data "azurerm_management_group" "my_management_group" {
   name = var.env
 }
 
-resource "azurerm_user_assigned_identity" "example" {
+resource "azurerm_user_assigned_identity" "ama_identity" {
   name                = "ama-agent-identity"
   resource_group_name = var.resourcegroupname
   location            = var.location
@@ -115,6 +115,8 @@ resource "azurerm_policy_assignment" "monitor_agent_assignment" {
     bringYourOwnUserAssignedManagedIdentity = {
       value = true
     }
+    userAssignedIdentityResourceId = {
+      value = azurerm_user_assigned_identity.ama_identity.id
   })
 }
 
