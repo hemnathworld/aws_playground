@@ -155,3 +155,6 @@ resource "azurerm_windows_virtual_machine" "vm" {
     version   = "latest"
   }
 }
+
+
+https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-policies
