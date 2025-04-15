@@ -158,3 +158,10 @@ resource "azurerm_windows_virtual_machine" "vm" {
 
 
 https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-policies
+
+[Preview]: Configure system-assigned managed identity to enable Azure Monitor assignments on VMs
+Configure Linux virtual machines to run Azure Monitor Agent with system-assigned managed identity-based authentication
+Configure Windows virtual machines to run Azure Monitor Agent using system-assigned managed identity
+Configure Windows Machines to be associated with a Data Collection Rule or a Data Collection Endpoint
+Configure Linux Machines to be associated with a Data Collection Rule or a Data Collection Endpoint
+
