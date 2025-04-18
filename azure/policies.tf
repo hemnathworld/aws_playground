@@ -165,3 +165,5 @@ Configure Windows virtual machines to run Azure Monitor Agent using system-assig
 Configure Windows Machines to be associated with a Data Collection Rule or a Data Collection Endpoint
 Configure Linux Machines to be associated with a Data Collection Rule or a Data Collection Endpoint
 
+
+/subscriptions/a5dd051b-df10-4969-a584-b416c4dfa6c6/resourceGroups/ama-log-analytics-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ama-testuser
