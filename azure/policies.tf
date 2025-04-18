@@ -167,3 +167,5 @@ Configure Linux Machines to be associated with a Data Collection Rule or a Data 
 
 
 /subscriptions/a5dd051b-df10-4969-a584-b416c4dfa6c6/resourceGroups/ama-log-analytics-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ama-testuser
+
+/subscriptions/a5dd051b-df10-4969-a584-b416c4dfa6c6/resourceGroups/ama-log-analytics-rg/providers/Microsoft.Insights/dataCollectionRules/ama-agent-dcr
