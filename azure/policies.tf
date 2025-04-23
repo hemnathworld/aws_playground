@@ -157,6 +157,13 @@ resource "azurerm_windows_virtual_machine" "vm" {
 }
 
 
+resource "azurerm_monitor_data_collection_endpoint" "dc-endpoint" {
+  name                          = "ama-datacollection-endpoint"
+  resource_group_name           = <resource group name>
+  location                      = <location>
+  description                   = "monitor_data_collection_endpoint"
+}
+
 https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-policies
 
 [Preview]: Configure system-assigned managed identity to enable Azure Monitor assignments on VMs
