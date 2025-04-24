@@ -164,6 +164,14 @@ resource "azurerm_monitor_data_collection_endpoint" "dc-endpoint" {
   description                   = "monitor_data_collection_endpoint"
 }
 
+
+resource "azurerm_monitor_data_collection_rule_association" "dcr_assoc" {
+  name                    = "vm-dcr-association"
+  target_resource_id      = azurerm_linux_virtual_machine.vm.id
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.dcr.id
+  data_collection_endpoint_id = 
+}
+
 https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-policies
 
 [Preview]: Configure system-assigned managed identity to enable Azure Monitor assignments on VMs
