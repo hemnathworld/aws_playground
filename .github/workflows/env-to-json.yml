@@ -1,0 +1,27 @@
+name: Load GitHub Environment Vars into JSON
+
+on:
+  workflow_dispatch:
+    inputs:
+      env_name:
+        description: "Target environment (dev, qa, prod)"
+        required: true
+        type: string
+
+jobs:
+  load-vars:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.env_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Convert GitHub Environment vars to JSON
+        run: |
+          echo "ENV_JSON=${{ toJSON(vars) }}" >> "$GITHUB_ENV"
+
+      - name: Debug - Print ENV_JSON
+        run: |
+          echo "Environment JSON is:"
+          echo "$ENV_JSON" | jq
