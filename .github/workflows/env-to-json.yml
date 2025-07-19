@@ -19,7 +19,9 @@ jobs:
 
       - name: Convert GitHub Environment vars to JSON
         run: |
-          echo "ENV_JSON=${{ toJSON(vars) }}" >> "$GITHUB_ENV"
+          echo 'ENV_JSON<<EOF' >> "$GITHUB_ENV"
+          echo '${{ toJSON(vars) }}' >> "$GITHUB_ENV"
+          echo 'EOF' >> "$GITHUB_ENV"
 
       - name: Debug - Print ENV_JSON
         run: |
